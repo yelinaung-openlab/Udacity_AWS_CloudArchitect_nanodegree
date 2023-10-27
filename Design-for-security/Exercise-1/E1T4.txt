@@ -1,0 +1,32 @@
+Based on the architecture diagram, and the steps you have taken so far to upload data and access the application web service, identify at least 2 obvious poor practices as it relates to security.  Include justification.
+
+# Poor practice 1
+In the provided setup, both the RecipeWebServiceInstance and the AttackInstance share the same IAM Role (InstanceRole). 
+This is a security concern because it violates the principle of least privilege. Each instance should have a role tailored to its specific requirements and limited to accessing only the resources it needs.
+
+Justification for Poor practice 1:
+Assigning the same IAM Role to multiple instances creates a potential security risk because if one instance is compromised, the attacker gains the same permissions on all resources associated with that role, which might be excessive.
+
+# Poor practice 2
+The IAM Role (InstanceRole) has full access to any S3 bucket. This, once again, violates the principle of least privilege. Roles should be defined to grant specific permissions to a limited set of resources and actions, ensuring that no more access is granted than necessary.
+
+Justification for Poor practice 2:
+Granting full access to S3 buckets for any instance increases the risk of unauthorized data access, modification, or deletion. Restricting access to the minimum necessary permissions is a fundamental security practice.
+
+# Poor practice 3
+In the VPC configuration, all route definitions use a DestinationCidrBlock of 0.0.0.0/0. This practice allows unrestricted communication, which means that in the event of a breach, an attacker could potentially transfer data to any IP address, both within and outside the VPC.
+
+Justification for Poor practice 3:
+Using such broad routing rules can be exploited by attackers to exfiltrate data, bypassing network security controls, and potentially leading to unauthorized data transfers or data exposure.
+
+# Poor practice 4
+The security groups (WebAppSG, AppLoadBalancerSG, and AttackInstanceSG) have both ingress and egress rules configured with a CidrIp of 0.0.0.0/0. This configuration allows communication from/to any IP address, creating a larger attack surface and increasing the potential for unwanted connections by malicious actors.
+
+Justification for Poor practice 4:
+Leaving security groups wide open increases the risk of unauthorized access, as attackers can potentially exploit these open connections to gain entry to the network or perform malicious actions.
+
+# Poor practice 5
+WebAppSG allows communication on ports 5000 and 8080, which are primarily used for HTTP-based communication. For a publicly facing instance, it's advisable to configure port 443 for HTTPS-based communication, which provides a higher level of security.
+
+Justification for Poor practice 5:
+Using non-standard ports for a public-facing web service may not provide the necessary level of encryption and security. Port 443 is standard for HTTPS, which ensures data encryption and secure communication between the client and the server.
